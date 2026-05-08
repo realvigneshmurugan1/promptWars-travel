@@ -3,7 +3,8 @@
  * Wires together all modules: Visual DNA, Scout, Map, Coach, Weather, Spectral
  */
 
-import { extractVisualDNA } from './visual-dna.js';
+import { analyzeAestheticWithAI } from './ai-vision.js';
+import { initGoogleServices, scheduleShoot } from './google-services.js';
 import { scoutLocations, generateScoutAlert, checkTraffic } from './scout.js';
 import { fetchWeather, getWeatherAdvice } from './weather.js';
 import { generateCoaching } from './coach.js';
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupUpload();
   requestGeolocation();
+  initGoogleServices();
 
   // Restore session
   if (restoreState() && state.visualDNA) {
@@ -223,7 +225,8 @@ async function runAnalysis(files) {
   $('profile-description').textContent = `Decoding your visual signature from ${files.length} photos`;
 
   try {
-    state.visualDNA = await extractVisualDNA(files);
+    // Priority: Google Gemini AI Analysis
+    state.visualDNA = await analyzeAestheticWithAI(files);
     renderDNAResults(state.visualDNA);
     
     // Memory cleanup: Revoke thumbnails
@@ -232,9 +235,11 @@ async function runAnalysis(files) {
       if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
     });
   } catch (err) {
-    console.error('Analysis failed:', err);
-    $('profile-aesthetic').textContent = 'Analysis Error';
-    $('profile-description').textContent = 'Please try different photos.';
+    console.warn('AI Analysis failed, falling back to local engine:', err);
+    // Fallback: Local Fast Engine
+    const { extractVisualDNA } = await import('./visual-dna.js');
+    state.visualDNA = await extractVisualDNA(files);
+    renderDNAResults(state.visualDNA);
   }
 }
 
@@ -429,6 +434,7 @@ function renderLocationCards(locations) {
       <div class="location-actions">
         <button class="btn btn-ghost btn-spectral" data-index="${idx}">👻 Spectral</button>
         <button class="btn btn-ghost btn-focus" data-index="${idx}">📍 Focus</button>
+        <button class="btn btn-ghost btn-calendar" data-index="${idx}">📅 Schedule</button>
       </div>
     `;
 
@@ -446,6 +452,7 @@ function renderLocationCards(locations) {
 
     card.querySelector('.btn-spectral').addEventListener('click', () => showSpectral(loc));
     card.querySelector('.btn-focus').addEventListener('click', () => focusLocation(loc.lat, loc.lon));
+    card.querySelector('.btn-calendar').addEventListener('click', () => scheduleShoot(loc, loc.bestTime || '18:00'));
 
     container.appendChild(card);
   });

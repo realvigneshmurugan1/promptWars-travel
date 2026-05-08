@@ -8,9 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script type="module" crossorigin src="/assets/index-GwkJTJyM.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-s9lL4KHH.css">
+  <script type="module" crossorigin src="/assets/index-D08PRIp-.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C6WhVBQz.css">
 </head>
 <body>
   <!-- Loading Screen -->
@@ -148,12 +147,12 @@
             <p class="alert-text">Scanning your proximity for aesthetic matches...</p>
           </div>
 
-          <div class="scout-locations" id="scout-locations">
+          <div class="scout-locations" id="scout-locations" role="list" aria-label="Aesthetic photography spots">
             <!-- Location cards injected by JS -->
           </div>
         </div>
         <div class="scout-map-container">
-          <div id="map" class="map-view"></div>
+          <div id="map" class="map-view" role="application" aria-label="Interactive Google Map with photography spots"></div>
           <div class="map-overlay" id="map-overlay">
             <div class="map-overlay-card hidden" id="location-detail-card">
               <!-- Detail card injected by JS -->
@@ -193,9 +192,25 @@
       <div class="director-layout" id="director-layout">
         <!-- Director cards injected by JS -->
       </div>
-    </section>
+    </main>
 
-    <!-- Spectral Overlay -->
+  <!-- Live Director Overlay -->
+  <div id="live-view-container" class="hidden">
+    <video id="live-video" autoplay playsinline></video>
+    <canvas id="live-canvas"></canvas>
+    
+    <div class="live-overlay-top">
+      <div class="live-badge">LIVE DIRECTOR</div>
+      <div id="live-stats">ISO 100 • f/2.8 • 1/500s</div>
+    </div>
+    
+    <div class="live-overlay-bottom">
+      <div id="live-tip">Wait for subject alignment...</div>
+      <button id="close-live" class="btn-icon">×</button>
+    </div>
+  </div>
+
+  <!-- Spectral Overlay -->
     <div class="spectral-overlay hidden" id="spectral-overlay">
       <div class="spectral-content">
         <button class="spectral-close" id="spectral-close">✕</button>
