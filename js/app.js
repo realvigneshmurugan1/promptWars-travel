@@ -21,6 +21,25 @@ const state = {
   selectedLocation: null,
 };
 
+// ============ CACHE ============
+function saveState() {
+  localStorage.setItem('lumina_state', JSON.stringify({
+    visualDNA: state.visualDNA,
+    userLocation: state.userLocation,
+    weather: state.weather
+  }));
+}
+
+function restoreState() {
+  const cached = localStorage.getItem('lumina_state');
+  if (cached) {
+    const data = JSON.parse(cached);
+    Object.assign(state, data);
+    return true;
+  }
+  return false;
+}
+
 // ============ DOM REFS ============
 const $ = (id) => document.getElementById(id);
 
@@ -38,6 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
   setupNavigation();
   setupUpload();
   requestGeolocation();
+
+  // Restore session
+  if (restoreState() && state.visualDNA) {
+    showDNAResults(state.visualDNA);
+    launchScout();
+  }
 });
 
 // ============ NAVIGATION ============
@@ -172,8 +197,11 @@ async function handlePhotos(files) {
   for (const file of files) {
     const thumb = document.createElement('div');
     thumb.className = 'preview-thumb';
+    thumb.setAttribute('role', 'img');
+    thumb.setAttribute('aria-label', `Thumbnail of uploaded photo: ${file.name}`);
     const img = document.createElement('img');
     img.src = URL.createObjectURL(file);
+    img.alt = ""; // Decorative as label is on parent
     thumb.appendChild(img);
     preview.appendChild(thumb);
   }
@@ -197,6 +225,12 @@ async function runAnalysis(files) {
   try {
     state.visualDNA = await extractVisualDNA(files);
     renderDNAResults(state.visualDNA);
+    
+    // Memory cleanup: Revoke thumbnails
+    const thumbnails = $('upload-preview').querySelectorAll('img');
+    thumbnails.forEach(img => {
+      if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+    });
   } catch (err) {
     console.error('Analysis failed:', err);
     $('profile-aesthetic').textContent = 'Analysis Error';
@@ -208,6 +242,7 @@ function renderDNAResults(dna) {
   $('profile-aesthetic').textContent = `${dna.icon} ${dna.aesthetic}`;
   $('profile-description').textContent = dna.description;
   $('profile-confidence').querySelector('.score-value').textContent = `${dna.confidence}%`;
+  saveState();
 
   // Visual DNA panel — palette + traits
   const visualPanel = $('profile-visual-dna');
@@ -374,8 +409,11 @@ function renderLocationCards(locations) {
     const card = document.createElement('div');
     card.className = 'location-card';
     card.dataset.index = idx;
+    card.setAttribute('role', 'listitem');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-label', `${loc.name}, ${loc.vibeMatch}% aesthetic match, ${loc.distanceFormatted} away`);
     card.innerHTML = `
-      <div class="location-card-header">
+      <div class="location-card-header" aria-hidden="true">
         <span class="location-name">${sanitize(loc.name)}</span>
         <span class="location-distance">${sanitize(loc.distanceFormatted)}</span>
       </div>
@@ -397,6 +435,13 @@ function renderLocationCards(locations) {
     card.addEventListener('click', (e) => {
       if (e.target.closest('.btn')) return;
       onLocationSelect(loc, idx);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onLocationSelect(loc, idx);
+      }
     });
 
     card.querySelector('.btn-spectral').addEventListener('click', () => showSpectral(loc));
@@ -510,30 +555,32 @@ function renderDirector(locations) {
 
     const card = document.createElement('div');
     card.className = 'director-card';
+    card.setAttribute('role', 'article');
+    card.setAttribute('aria-label', `Coaching manual for ${loc.name}`);
     card.innerHTML = `
-      <div class="director-card-header">
+      <div class="director-card-header" aria-hidden="true">
         <div class="director-card-icon" style="background:rgba(124,92,252,0.15);">📷</div>
         <div>
           <div class="director-card-title">${sanitize(loc.name)}</div>
           <div class="director-card-sub">${sanitize(coaching.currentLight.label)} • ${sanitize(coaching.currentLight.quality)}</div>
         </div>
       </div>
-      <div class="director-grid">
+      <div class="director-grid" role="group" aria-label="Camera Settings">
         <div class="director-item">
-          <div class="director-item-label">ISO</div>
-          <div class="director-item-value">${sanitize(coaching.settings.iso)}</div>
+          <div class="director-item-label" id="label-iso-${loc.id}">ISO</div>
+          <div class="director-item-value" aria-labelledby="label-iso-${loc.id}">${sanitize(coaching.settings.iso)}</div>
         </div>
         <div class="director-item">
-          <div class="director-item-label">Aperture</div>
-          <div class="director-item-value">${sanitize(coaching.settings.aperture)}</div>
+          <div class="director-item-label" id="label-ap-${loc.id}">Aperture</div>
+          <div class="director-item-value" aria-labelledby="label-ap-${loc.id}">${sanitize(coaching.settings.aperture)}</div>
         </div>
         <div class="director-item">
-          <div class="director-item-label">Shutter</div>
-          <div class="director-item-value">${sanitize(coaching.settings.shutter)}</div>
+          <div class="director-item-label" id="label-ss-${loc.id}">Shutter</div>
+          <div class="director-item-value" aria-labelledby="label-ss-${loc.id}">${sanitize(coaching.settings.shutter)}</div>
         </div>
         <div class="director-item">
-          <div class="director-item-label">White Bal.</div>
-          <div class="director-item-value">${sanitize(coaching.settings.wb)}</div>
+          <div class="director-item-label" id="label-wb-${loc.id}">White Bal.</div>
+          <div class="director-item-value" aria-labelledby="label-wb-${loc.id}">${sanitize(coaching.settings.wb)}</div>
         </div>
       </div>
       <div class="director-tip">
@@ -543,12 +590,12 @@ function renderDirector(locations) {
         <strong>📸 The Hero Shot:</strong> ${sanitize(coaching.heroShot)}
       </div>
       <div class="director-config">
-        <button class="btn btn-ghost btn-sm btn-copy-config" data-idx="${layout.children.length}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <button class="btn btn-ghost btn-sm btn-copy-config" data-idx="${layout.children.length}" aria-label="Copy camera configuration for ${loc.name} to clipboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copy Camera Config
         </button>
       </div>
-      ${coaching.isOptimalNow ? '<div style="margin-top:12px;padding:8px 12px;border-radius:8px;background:rgba(0,212,170,0.15);font-size:12px;color:#00d4aa;font-weight:600;">⚡ OPTIMAL TIME — Shoot Now!</div>' : `<div style="margin-top:12px;font-size:12px;color:#55556a;">Best time: ${sanitize(coaching.optimalTime)}</div>`}
+      ${coaching.isOptimalNow ? '<div style="margin-top:12px;padding:8px 12px;border-radius:8px;background:rgba(0,212,170,0.15);font-size:12px;color:#00d4aa;font-weight:600;" role="status">⚡ OPTIMAL TIME — Shoot Now!</div>' : `<div style="margin-top:12px;font-size:12px;color:#55556a;">Best time: ${sanitize(coaching.optimalTime)}</div>`}
     `;
 
     card.querySelector('.btn-copy-config').onclick = () => {

@@ -33,26 +33,53 @@ export async function initMap(containerId, lat, lon) {
     });
   }
 
-  const { Map } = await google.maps.importLibrary("maps");
-  
-  googleMap = new Map(document.getElementById(containerId), {
-    center: { lat, lng: lon },
-    zoom: 15,
-    mapId: 'LUMINA_DARK_MAP', // Requires cloud styling for the premium dark look
-    disableDefaultUI: true,
-    zoomControl: true,
-    styles: [
-      { "elementType": "geometry", "stylers": [{ "color": "#1d1d2b" }] },
-      { "elementType": "labels.text.fill", "stylers": [{ "color": "#8ec3b9" }] },
-      { "elementType": "labels.text.stroke", "stylers": [{ "color": "#1d1d2b" }] },
-      { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#333748" }] },
-      { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#64b5f6" }] },
-      { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#2c2c3d" }] },
-      { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#0e0e1a" }] }
-    ]
-  });
+  try {
+    const { Map } = await google.maps.importLibrary("maps");
+    
+    googleMap = new Map(document.getElementById(containerId), {
+      center: { lat, lng: lon },
+      zoom: 15,
+      mapId: 'LUMINA_DARK_MAP',
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: [
+        { "elementType": "geometry", "stylers": [{ "color": "#1d1d2b" }] },
+        { "elementType": "labels.text.fill", "stylers": [{ "color": "#8ec3b9" }] },
+        { "elementType": "labels.text.stroke", "stylers": [{ "color": "#1d1d2b" }] },
+        { "featureType": "administrative", "elementType": "geometry", "stylers": [{ "color": "#333748" }] },
+        { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#64b5f6" }] },
+        { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#2c2c3d" }] },
+        { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#0e0e1a" }] }
+      ]
+    });
 
-  return googleMap;
+    return googleMap;
+  } catch (err) {
+    console.error("Google Maps failed to load:", err);
+    showMapError(containerId);
+    return null;
+  }
+}
+
+/**
+ * Global handler for Google Maps authentication failures (InvalidKeyMapError)
+ */
+window.gm_authFailure = function() {
+  console.error("Google Maps authentication failed — invalid API key.");
+  showMapError('map');
+};
+
+function showMapError(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `
+    <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:#12121a; color:#fff; font-family:Outfit,sans-serif;">
+      <div style="font-size:48px; margin-bottom:20px;">🗺️</div>
+      <h3 style="margin-bottom:12px; color:#ff4757;">Google Maps API Key Required</h3>
+      <p style="color:#888; font-size:14px; max-width:300px; margin-bottom:24px;">To launch the scout, please add your Google Maps API key to <code>js/config.js</code>.</p>
+      <a href="https://console.cloud.google.com/" target="_blank" style="padding:10px 20px; background:rgba(124,92,252,0.2); border:1px solid #7c5cfc; color:#7c5cfc; border-radius:8px; text-decoration:none; font-size:12px; font-weight:600;">Get API Key</a>
+    </div>
+  `;
 }
 
 /**

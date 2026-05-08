@@ -63,92 +63,69 @@ function analyzeImage(img) {
   const imageData = ctx.getImageData(0, 0, size, size);
   const data = imageData.data;
   const pixelCount = size * size;
-
-  let totalR = 0, totalG = 0, totalB = 0;
-  let totalH = 0, totalS = 0, totalL = 0;
-  const colors = [];
+  let totalR = 0, totalG = 0, totalB = 0, totalS = 0, totalL = 0;
+  let totalL2 = 0; // For variance
+  let neonPixels = 0, edgeCount = 0;
   const colorBuckets = {};
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i] / 255;
-    const g = data[i + 1] / 255;
-    const b = data[i + 2] / 255;
-
-    totalR += r; totalG += g; totalB += b;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const l = (max + min) / 2;
-    let s = 0, h = 0;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-      else if (max === g) h = ((b - r) / d + 2) / 6;
-      else h = ((r - g) / d + 4) / 6;
-    }
-    totalH += h; totalS += s; totalL += l;
-
-    // Bucket colors for palette extraction
-    const bucketKey = `${Math.round(r * 4) * 64},${Math.round(g * 4) * 64},${Math.round(b * 4) * 64}`;
-    colorBuckets[bucketKey] = (colorBuckets[bucketKey] || 0) + 1;
-  }
-
-  const avgR = totalR / pixelCount;
-  const avgG = totalG / pixelCount;
-  const avgB = totalB / pixelCount;
-  const avgS = totalS / pixelCount;
-  const avgL = totalL / pixelCount;
-
-  // Single second pass: contrast variance + neon score + edge density
-  let varianceL = 0, neonPixels = 0, edgeCount = 0;
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const i = (y * size + x) * 4;
       const r8 = data[i], g8 = data[i + 1], b8 = data[i + 2];
       const r = r8 / 255, g = g8 / 255, b = b8 / 255;
-      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
-      // Variance (contrast)
-      varianceL += (lum - avgL) * (lum - avgL);
+      totalR += r; totalG += g; totalB += b;
+      
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const sat = max > 0 ? (max - min) / max : 0;
+      
+      totalL += lum;
+      totalL2 += lum * lum;
+      totalS += sat;
 
       // Neon detection
-      const maxC = Math.max(r8, g8, b8), minC = Math.min(r8, g8, b8);
-      const sat = maxC > 0 ? (maxC - minC) / maxC : 0;
       if (sat > 0.6 && (b8 > r8 || (r8 > 150 && b8 > 100 && g8 < 100))) neonPixels++;
 
-      // Sobel edge detection (skip border pixels)
-      if (x > 0 && x < size - 1 && y > 0 && y < size - 1) {
+      // Edge detection
+      if (x < size - 1 && y < size - 1) {
         const iR = (y * size + x + 1) * 4;
         const iD = ((y + 1) * size + x) * 4;
-        const lumR = 0.299 * data[iR] / 255 + 0.587 * data[iR + 1] / 255 + 0.114 * data[iR + 2] / 255;
-        const lumD = 0.299 * data[iD] / 255 + 0.587 * data[iD + 1] / 255 + 0.114 * data[iD + 2] / 255;
-        if (Math.abs(lumR - lum) + Math.abs(lumD - lum) > 30 / 255) edgeCount++;
+        const lumR = (0.299 * data[iR] + 0.587 * data[iR + 1] + 0.114 * data[iR + 2]) / 255;
+        const lumD = (0.299 * data[iD] + 0.587 * data[iD + 1] + 0.114 * data[iD + 2]) / 255;
+        if (Math.abs(lumR - lum) + Math.abs(lumD - lum) > 0.12) edgeCount++;
       }
+
+      // Fast bucket key
+      const bK = ((r8 >> 6) << 12) | ((g8 >> 6) << 6) | (b8 >> 6);
+      colorBuckets[bK] = (colorBuckets[bK] || 0) + 1;
     }
   }
-  const contrast = Math.min(1, Math.sqrt(varianceL / pixelCount) * 3);
+
+  const avgR = totalR / pixelCount, avgG = totalG / pixelCount, avgB = totalB / pixelCount;
+  const avgL = totalL / pixelCount;
+  const avgS = totalS / pixelCount;
+
+  // Contrast via variance formula
+  const variance = Math.max(0, (totalL2 / pixelCount) - (avgL * avgL));
+  const contrast = Math.min(1, Math.sqrt(variance) * 3.5);
+  
   const neonScore = Math.min(1, neonPixels / (pixelCount * 0.1));
   const edgeDensity = Math.min(1, edgeCount / (pixelCount * 0.15));
   const warmth = Math.min(1, Math.max(0, (avgR - avgB) * 2 + 0.5));
-
-  // Green dominance
   const greenDominance = Math.min(1, Math.max(0, (avgG - Math.max(avgR, avgB)) * 3 + 0.3));
 
-  // Simplicity (inverse of color variety)
-  const bucketCount = Object.keys(colorBuckets).length;
-  const maxBuckets = 125;
-  const simplicity = Math.max(0, 1 - bucketCount / maxBuckets);
-
-  // Extract top 5 dominant colors
+  // Extract colors from numeric buckets
   const sortedBuckets = Object.entries(colorBuckets)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([key]) => {
-      const [r, g, b] = key.split(',').map(Number);
+      const k = parseInt(key);
+      const r = (k >> 12) << 6, g = ((k >> 6) & 63) << 6, b = (k & 63) << 6;
       return `rgb(${r},${g},${b})`;
     });
+
+  const simplicity = Math.max(0, 1 - Object.keys(colorBuckets).length / 64);
 
   return {
     brightness: avgL,
