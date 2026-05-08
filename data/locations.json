@@ -1,0 +1,135 @@
+{
+  "cities": {
+    "chennai": {
+      "lat": 13.0827,
+      "lon": 80.2707,
+      "name": "Chennai",
+      "locations": [
+        {
+          "id": "kapaleeshwarar",
+          "name": "Kapaleeshwarar Temple",
+          "lat": 13.0339,
+          "lon": 80.2694,
+          "tags": ["sacred", "dravidian", "geometric", "colorful"],
+          "vibeProfile": { "warmth": 0.7, "contrast": 0.6, "texture": 0.8, "color": 0.9, "geometry": 0.9 },
+          "spectralType": "temple",
+          "description": "A 7th-century Dravidian temple with a stunning gopuram tower — 40m of carved mythology in vivid color. The geometric patterns are endlessly photogenic.",
+          "heroShot": "Frame the gopuram through the pillared corridor at dawn, using the columns as leading lines toward the painted tower.",
+          "bestTime": "06:00-07:30",
+          "category": "heritage"
+        },
+        {
+          "id": "marina-beach",
+          "name": "Marina Beach Promenade",
+          "lat": 13.0500,
+          "lon": 80.2824,
+          "tags": ["waterfront", "golden-hour", "vast", "atmospheric"],
+          "vibeProfile": { "warmth": 0.9, "contrast": 0.5, "texture": 0.3, "color": 0.7, "geometry": 0.2 },
+          "spectralType": "waterfront",
+          "description": "The second-longest urban beach in the world. At sunrise, the Bay of Bengal paints the sky in gradients that no filter can replicate.",
+          "heroShot": "Shoot the fishermen's silhouettes against the orange sunrise, with the wet sand reflecting the sky like a mirror.",
+          "bestTime": "05:30-06:30",
+          "category": "landscape"
+        },
+        {
+          "id": "mylapore-streets",
+          "name": "Mylapore Heritage Streets",
+          "lat": 13.0340,
+          "lon": 80.2680,
+          "tags": ["alley", "street-art", "texture", "moody"],
+          "vibeProfile": { "warmth": 0.5, "contrast": 0.7, "texture": 0.9, "color": 0.6, "geometry": 0.5 },
+          "spectralType": "alley",
+          "description": "A labyrinth of narrow lanes where kolam patterns, temple walls, and flower vendors create a sensory overload of texture and color.",
+          "heroShot": "Capture the morning kolam artist from above, the white rice flour patterns contrasting against the dark wet street.",
+          "bestTime": "06:00-08:00",
+          "category": "street"
+        },
+        {
+          "id": "anna-nagar-tower",
+          "name": "Anna Nagar Tower Park",
+          "lat": 13.0850,
+          "lon": 80.2100,
+          "tags": ["brutalist", "geometric", "viewpoint", "minimal"],
+          "vibeProfile": { "warmth": 0.3, "contrast": 0.8, "texture": 0.6, "color": 0.2, "geometry": 0.9 },
+          "spectralType": "viewpoint",
+          "description": "A brutalist concrete tower rising from a manicured park. The raw geometric form creates stark, modernist compositions against the sky.",
+          "heroShot": "Shoot straight up through the tower's internal spiral for a dizzying geometric abstraction in concrete and sky.",
+          "bestTime": "16:00-17:30",
+          "category": "architecture"
+        },
+        {
+          "id": "t-nagar-market",
+          "name": "T. Nagar Bazaar District",
+          "lat": 13.0418,
+          "lon": 80.2341,
+          "tags": ["market", "neon", "crowd", "cyberpunk", "color"],
+          "vibeProfile": { "warmth": 0.6, "contrast": 0.7, "texture": 0.7, "color": 0.9, "geometry": 0.4 },
+          "spectralType": "market",
+          "description": "South India's busiest shopping district transforms at night into a cyberpunk maze of neon signs, silk shops, and chaotic energy.",
+          "heroShot": "From the footbridge, capture the river of traffic and neon signs in long exposure — the chaos distilled into streaks of light.",
+          "bestTime": "18:30-20:00",
+          "category": "street"
+        },
+        {
+          "id": "san-thome-basilica",
+          "name": "San Thome Basilica",
+          "lat": 13.0338,
+          "lon": 80.2782,
+          "tags": ["gothic", "white", "minimal", "sacred"],
+          "vibeProfile": { "warmth": 0.4, "contrast": 0.5, "texture": 0.4, "color": 0.3, "geometry": 0.8 },
+          "spectralType": "historical",
+          "description": "A Neo-Gothic white basilica built over the tomb of St. Thomas the Apostle. The stark white against blue sky is pure minimalism.",
+          "heroShot": "Use the symmetrical nave as a vanishing point, with the stained glass windows creating color accents in the white space.",
+          "bestTime": "10:00-11:00",
+          "category": "architecture"
+        }
+      ]
+    },
+    "default": {
+      "lat": 13.0827,
+      "lon": 80.2707,
+      "name": "Your Area",
+      "locations": [
+        {
+          "id": "nearby-park",
+          "name": "Urban Green Space",
+          "lat": 0,
+          "lon": 0,
+          "tags": ["nature", "green", "peaceful", "golden-hour"],
+          "vibeProfile": { "warmth": 0.6, "contrast": 0.4, "texture": 0.5, "color": 0.6, "geometry": 0.3 },
+          "spectralType": "park",
+          "description": "Every city hides pockets of green. The interplay of natural and urban elements creates unique compositional opportunities.",
+          "heroShot": "Find where the tree canopy creates a natural frame for the skyline beyond — nature framing civilization.",
+          "bestTime": "07:00-08:00",
+          "category": "landscape"
+        },
+        {
+          "id": "nearby-alley",
+          "name": "Texture-Rich Alleyway",
+          "lat": 0,
+          "lon": 0,
+          "tags": ["alley", "texture", "moody", "street-art"],
+          "vibeProfile": { "warmth": 0.4, "contrast": 0.8, "texture": 0.9, "color": 0.5, "geometry": 0.6 },
+          "spectralType": "alley",
+          "description": "The hidden arteries of urban life. Peeling paint, graffiti, and fire escapes create compositions that galleries would envy.",
+          "heroShot": "Wait for a single figure to walk through the shaft of light between buildings — the urban spotlight moment.",
+          "bestTime": "11:00-13:00",
+          "category": "street"
+        },
+        {
+          "id": "nearby-viewpoint",
+          "name": "Elevated Vantage Point",
+          "lat": 0,
+          "lon": 0,
+          "tags": ["viewpoint", "vast", "panorama", "golden-hour"],
+          "vibeProfile": { "warmth": 0.7, "contrast": 0.5, "texture": 0.2, "color": 0.6, "geometry": 0.4 },
+          "spectralType": "viewpoint",
+          "description": "Height transforms chaos into pattern. From above, the city reveals its true geometry — the organic grid of human settlement.",
+          "heroShot": "Shoot the transition from day to night as streetlights flicker on, creating a grid of warm points against the blue dusk.",
+          "bestTime": "17:30-19:00",
+          "category": "landscape"
+        }
+      ]
+    }
+  }
+}

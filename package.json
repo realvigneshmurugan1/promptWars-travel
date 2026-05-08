@@ -1,0 +1,14 @@
+{
+  "name": "lumina",
+  "version": "1.0.0",
+  "description": "Aesthetic-Accurate Travel Photography Scout",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  }
+}

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumina — Aesthetic Photography Scout</title>
+  <meta name="description" content="Transform your photography into a dynamic travel experience. Lumina discovers photo-worthy spots that match your unique visual style." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-logo">
+        <div class="logo-ring"></div>
+        <div class="logo-ring ring-2"></div>
+        <div class="logo-ring ring-3"></div>
+        <span class="logo-text">LUMINA</span>
+      </div>
+      <p class="loading-tagline">Aesthetic Photography Scout</p>
+      <div class="loading-bar">
+        <div class="loading-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app hidden">
+    <!-- Navigation -->
+    <nav id="main-nav" class="main-nav">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </div>
+        <span class="brand-name">LUMINA</span>
+        <span class="brand-badge">SCOUT</span>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-section="visual-dna" id="nav-visual-dna">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Visual DNA</span>
+        </button>
+        <button class="nav-tab" data-section="scout-map" id="nav-scout-map">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <span>Scout Map</span>
+        </button>
+        <button class="nav-tab" data-section="aesthetic-route" id="nav-aesthetic-route">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          <span>Route</span>
+        </button>
+        <button class="nav-tab" data-section="directors-manual" id="nav-directors-manual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>Director</span>
+        </button>
+      </div>
+      <div class="nav-status">
+        <div class="status-dot" id="gps-status"></div>
+        <span class="status-text" id="gps-text">Locating...</span>
+      </div>
+    </nav>
+
+    <!-- Section: Visual DNA -->
+    <section id="visual-dna" class="section active">
+      <div class="section-header">
+        <h1>Visual DNA Extraction</h1>
+        <p class="section-subtitle">Upload your photography to decode your unique aesthetic signature</p>
+      </div>
+
+      <div class="dna-layout">
+        <!-- Upload Area -->
+        <div class="upload-zone" id="upload-zone">
+          <div class="upload-inner">
+            <div class="upload-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="6" y="10" width="36" height="28" rx="3"/>
+                <circle cx="18" cy="22" r="4"/>
+                <path d="M42 32l-8-8-6 6-4-4-12 12h30z"/>
+                <path d="M24 4v6M20 7l4-3 4 3"/>
+              </svg>
+            </div>
+            <h3>Drop your photos here</h3>
+            <p>or click to browse • JPG, PNG, WebP</p>
+            <input type="file" id="photo-input" accept="image/*" multiple hidden />
+            <button class="btn btn-primary" id="browse-btn">
+              <span>Select Photos</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </button>
+          </div>
+          <div class="upload-preview" id="upload-preview"></div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="dna-results hidden" id="dna-results">
+          <div class="dna-profile-card">
+            <div class="profile-header">
+              <div class="profile-badge" id="profile-badge">
+                <span class="badge-icon">◈</span>
+              </div>
+              <div class="profile-info">
+                <h2 id="profile-aesthetic">Analyzing...</h2>
+                <p class="profile-sub" id="profile-description">Decoding your visual signature</p>
+              </div>
+              <div class="profile-score" id="profile-confidence">
+                <span class="score-value">—</span>
+                <span class="score-label">Match</span>
+              </div>
+            </div>
+
+            <div class="profile-visual-dna" id="profile-visual-dna">
+              <!-- Color palette, traits, etc. injected by JS -->
+            </div>
+          </div>
+
+          <div class="dna-metrics" id="dna-metrics">
+            <!-- Metric cards injected by JS -->
+          </div>
+
+          <button class="btn btn-accent btn-lg" id="start-scout-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+            <span>Launch Scout</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Scout Map -->
+    <section id="scout-map" class="section">
+      <div class="scout-layout">
+        <div class="scout-sidebar">
+          <div class="sidebar-header">
+            <h2>Scout Alerts</h2>
+            <div class="weather-badge" id="weather-badge">
+              <span class="weather-icon">☀</span>
+              <span class="weather-temp" id="weather-temp">--°</span>
+            </div>
+          </div>
+
+          <div class="scout-alert" id="scout-alert">
+            <div class="alert-pulse"></div>
+            <p class="alert-text">Scanning your proximity for aesthetic matches...</p>
+          </div>
+
+          <div class="scout-locations" id="scout-locations">
+            <!-- Location cards injected by JS -->
+          </div>
+        </div>
+        <div class="scout-map-container">
+          <div id="map" class="map-view"></div>
+          <div class="map-overlay" id="map-overlay">
+            <div class="map-overlay-card hidden" id="location-detail-card">
+              <!-- Detail card injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Aesthetic Route -->
+    <section id="aesthetic-route" class="section">
+      <div class="section-header">
+        <h1>The Aesthetic Route</h1>
+        <p class="section-subtitle">Your curated path with Vibe Match scores</p>
+      </div>
+      <div class="route-layout">
+        <div class="route-timeline" id="route-timeline">
+          <!-- Route steps injected by JS -->
+        </div>
+        <div class="route-summary" id="route-summary">
+          <div class="summary-card glass-card">
+            <h3>Route Overview</h3>
+            <div class="summary-stats" id="summary-stats">
+              <!-- Stats injected -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: Director's Manual -->
+    <section id="directors-manual" class="section">
+      <div class="section-header">
+        <h1>The Director's Manual</h1>
+        <p class="section-subtitle">Technical photography guidance for your scouted locations</p>
+      </div>
+      <div class="director-layout" id="director-layout">
+        <!-- Director cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- Spectral Overlay -->
+    <div class="spectral-overlay hidden" id="spectral-overlay">
+      <div class="spectral-content">
+        <button class="spectral-close" id="spectral-close">✕</button>
+        <div class="spectral-header">
+          <span class="spectral-badge">SPECTRAL CONTEXT</span>
+          <h2 id="spectral-title">The Ghost of This Place</h2>
+        </div>
+        <div class="spectral-body" id="spectral-body">
+          <!-- Narrative injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="analysis-canvas" style="display:none;"></canvas>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
